@@ -257,7 +257,7 @@ export default {
           self.tabHistory.loading = true
           const data = {
             type: 'Bill',
-            orderNo: self.tabDetail.bill.orderNo
+            associateID: self.tabDetail.bill.orderNo
           }
           fetchHistory(data).then((response) => {
             self.tabHistory.list = response.data.items

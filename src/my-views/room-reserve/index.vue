@@ -91,18 +91,16 @@
           <span style="margin: 5px"/>
 
           <el-button icon="el-icon-back" @click="handleCloseDetail">返回</el-button>
-          <el-button type="success" icon="el-icon-check" style="margin-left: 20px" @click="handleSave">保存</el-button>
+          <el-button type="success" icon="el-icon-check" @click="handleSave">保存</el-button>
 
-          <span style="margin: 5px"/>
-
-          <el-button :disabled.sync="toolDisabled" @click="handleCloseDetail">{{ $t('客人档案') }}</el-button>
+          <!-- <el-button :disabled.sync="toolDisabled" @click="handleCloseDetail">{{ $t('客人档案') }}</el-button> -->
           <el-button :disabled.sync="toolDisabled" @click="handleOpenHistory">{{ $t('历史记录') }}</el-button>
-          <router-link :to="'../Bill/index/'+temp.orderNo">
+          <!-- <router-link :to="'../Bill/index/'+temp.orderNo">
             <el-button :disabled.sync="toolDisabled">{{ $t('账单') }}</el-button>
-          </router-link>
+          </router-link> -->
           <!-- <el-button :disabled.sync="toolDisabled" @click="dialogFormVisible = false">{{ $t('账单') }}</el-button> -->
 
-          <el-button style="margin-left: 30px;" type="success">#option#</el-button>
+          <!-- <el-button style="margin-left: 30px;" type="success">#option#</el-button> -->
         </sticky>
         <!-- 编辑对话框 -->
         <!-- <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible"
@@ -536,7 +534,7 @@ export default {
       this.listLoading = true
       const data = {
         type: 'RoomReserve',
-        orderNo: this.temp.orderNo
+        associateID: this.temp.orderNo
       }
       fetchHistory(data).then((response) => {
         this.histories = response.data.items

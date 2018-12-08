@@ -24,7 +24,7 @@
         </div>
         <!-- 表格 -->
         <el-table v-loading="tabList.loading" id="table" key="0" :data="tabList.customers" width="100%"
-          height="380px" border fit highlight-current-row @row-dblclick="tabList.toCustomerDetail">
+          height="380px" border fit highlight-current-row @row-dblclick="tabList.toDetailEdit">
           <el-table-column :label="$t('姓名')" width="160" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.lastName }}{{ scope.row.firstName }}</span>
@@ -73,13 +73,26 @@
           <span style="margin: 5px"/>
 
           <el-button icon="el-icon-back" @click="tabDetail.onBack">返回</el-button>
+          <el-button type="success" icon="el-icon-check" @click="tabDetail.onSave">保存</el-button>
           <el-button @click="tabDetail.toHistoryTab">{{ $t('历史记录') }}</el-button>
         </sticky>
 
         <el-form ref="dataForm" :model="tabDetail.customer" :inline="true"
           label-position="left" label-width="140px" style="padding-top: 60px">
           <el-row>
-            <el-form-item :label="$t('身份证号')" prop="firstName">
+            <el-col :sm="10" :lg="8" >
+              <el-form-item :label="$t('房号')" >
+                <el-input v-model="tabDetail.customer.roomNo" />
+              </el-form-item>
+            </el-col>
+            <el-col :sm="10" :lg="8">
+              <el-form-item :label="$t('入住日期')" >
+                <span>{{ tabDetail.customer.checkinDate|parseTime('{y}-{m}-{d}') }} ~ {{ tabDetail.customer.checkoutDate|parseTime('{y}-{m}-{d}') }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-form-item :label="$t('身份证号')" >
               <el-input v-model="tabDetail.customer.idNumber" />
             </el-form-item>
             <el-form-item>
@@ -88,31 +101,31 @@
           </el-row>
           <el-row>
             <el-col :sm="10" :lg="8" >
-              <el-form-item :label="$t('姓')" prop="lastName">
+              <el-form-item :label="$t('姓')" >
                 <el-input v-model="tabDetail.customer.lastName" />
               </el-form-item>
-              <el-form-item :label="$t('名')" prop="firstName">
+              <el-form-item :label="$t('名')" >
                 <el-input v-model="tabDetail.customer.firstName" />
               </el-form-item>
-              <el-form-item :label="$t('性别')" prop="sex">
+              <el-form-item :label="$t('性别')" >
                 <el-radio-group v-model="tabDetail.customer.sex">
                   <el-radio :label="0">{{ $t('female') }}</el-radio>
                   <el-radio :label="1" >{{ $t('male') }}</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item :label="$t('出生日期')" prop="checkinDate">
+              <el-form-item :label="$t('出生日期')" >
                 <el-date-picker v-model="tabDetail.customer.dateOfBirth" :picker-options="pickerOptions" type="date"/>
               </el-form-item>
 
             </el-col>
             <el-col :sm="10" :lg="8">
-              <el-form-item :label="$t('用户号')" prop="userNo">
+              <el-form-item :label="$t('用户号')" >
                 <el-input v-model="tabDetail.customer.userNo" />
               </el-form-item>
-              <el-form-item :label="$t('电话')" prop="contactNumber">
+              <el-form-item :label="$t('电话')" >
                 <el-input v-model="tabDetail.customer.contactNumber" />
               </el-form-item>
-              <el-form-item :label="$t('邮箱')" prop="email">
+              <el-form-item :label="$t('邮箱')" >
                 <el-input v-model="tabDetail.customer.email" />
               </el-form-item>
             </el-col>
@@ -121,18 +134,19 @@
 
           <el-row>
             <el-col :sm="10" :lg="8">
-              <el-form-item :label="$t('公司名')" prop="companyName">
+              <el-form-item :label="$t('公司名')" >
                 <el-input v-model="tabDetail.customer.companyName" />
               </el-form-item>
-              <el-form-item :label="$t('公司类型')" prop="companyType">
+              <el-form-item :label="$t('公司类型')" >
                 <el-input v-model="tabDetail.customer.companyType" />
               </el-form-item>
             </el-col>
             <el-col :sm="10" :lg="8">
-              <el-form-item :label="$t('公司代码')" prop="organizationCode">
+              <el-form-item :label="$t('公司代码')" >
+
                 <el-input v-model="tabDetail.customer.organizationCode" />
               </el-form-item>
-              <el-form-item :label="$t('营业代码')" prop="registeredCode">
+              <el-form-item :label="$t('营业代码')" >
                 <el-input v-model="tabDetail.customer.registeredCode" />
               </el-form-item>
             </el-col>
@@ -188,7 +202,7 @@
 </template>
 
 <script>
-import { fetchCustomers, getCustomerDetail } from '@/api/customer'
+import customerAPI from '@/api/customer'
 import { fetchHistory } from '@/api/history'
 import axios from 'axios'
 import waves from '@/directive/waves' // Waves directive
@@ -258,7 +272,7 @@ export default {
         loading: true,
         getCustomers: () => { // 获取客人列表
           self.tabList.loading = true
-          fetchCustomers(self.tabList.queryParams).then(response => {
+          customerAPI.fetchCustomers(self.tabList.queryParams).then(response => {
             self.tabList.customers = response.data.items
             self.tabList.total = response.data.total
             setTimeout(() => {
@@ -270,15 +284,17 @@ export default {
           self.tabList.queryParams.page = 1
           self.tabList.getCustomers()
         },
-        toCustomerDetail: row => { // 账单详细编辑
+        toDetailEdit: row => { // 客人详细编辑
+          self.state = 'edit'
           self.activeName = 'detail'
           self.tabDetail.currentCustomerID = row.id
           self.tabDetail.getCustomerDetail()
         },
       },
 
-      /* 账单详细 tabDetail */
+      /* 客人详细 tabDetail */
       tabDetail: {
+        state: '',
         loading: false,
         reading: false,
         currentCustomerID: undefined,
@@ -286,7 +302,7 @@ export default {
 
         getCustomerDetail: () => {
           self.tabDetail.loading = true
-          getCustomerDetail({ customerID: self.tabDetail.currentCustomerID }).then(response => {
+          customerAPI.getCustomerDetail({ customerID: self.tabDetail.currentCustomerID }).then(response => {
             const customer = response.data
             self.tabDetail.customer = Object.assign({}, customer)
             setTimeout(() => {
@@ -297,6 +313,28 @@ export default {
         onBack: () => {
           self.activeName = 'list'
         }, // close
+        onSave: () => {
+          if (self.tabDetail.state === 'create') {
+            self.tabDetail.createCustomer()
+          } else {
+            self.tabDetail.updateCustomer()
+          }
+        },
+        createCustomer: () => {
+
+        },
+        updateCustomer: () => {
+          this.$refs['dataForm'].validate(valid => {
+            if (valid) {
+              const tempData = Object.assign({}, self.tabDetail.customer)
+              console.log(tempData)
+              customerAPI.updateCustomer(tempData).then(() => {
+                self.tabDetail.getCustomerDetail()
+                this.$notify({ title: '成功', message: '更新成功', type: 'success', duration: 1000 })
+              })
+            }
+          })
+        },
         toHistoryTab: () => {
           // this.tab3Title = this.$t('历史记录')
           self.activeName = 'history'
@@ -340,8 +378,8 @@ export default {
         onRefresh: () => {
           self.tabHistory.loading = true
           const data = {
-            type: 'customer',
-            orderNo: self.tabDetail.customer.orderNo
+            type: 'Customer',
+            associateID: self.tabDetail.customer.id
           }
           fetchHistory(data).then((response) => {
             self.tabHistory.list = response.data.items

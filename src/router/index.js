@@ -112,6 +112,19 @@ export default new Router({
 
 export const asyncRouterMap = [
   {
+    path: '/FloorPlan',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/my-views/floor-plan/index'),
+        name: 'FloorPlan',
+        meta: { title: 'FloorPlan', icon: 'list', noCache: false }
+      }
+    ]
+  },
+
+  {
     path: '/Customer',
     component: Layout,
     children: [

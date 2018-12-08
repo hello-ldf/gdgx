@@ -2,7 +2,8 @@
 import Mock from 'mockjs'
 import { param2Obj, compare, parseTime } from '@/utils'
 import { initOCList } from '@/mock/order-customer'
-// import { addHistory } from '@/mock/history'
+
+import { addHistory } from '@/mock/history'
 
 const _customers = []
 
@@ -35,6 +36,54 @@ export default {
       }
     }
   },
+
+  createCustomer: (config) => {
+    const data = JSON.parse(config.body)
+    data.id = Mock.Random.id()
+    _customers.unshift(data)
+
+    const history = {}
+    history.type = 'Customer'
+    history.associateID = data.id
+    history.operateDate = new Date()
+    history.employeeID = 'admin'
+    history.employeeName = 'Admin'
+    history.operate = '新增记录。'
+    for (const key in data) {
+      history.operate += `${key}: ${data[key]}; `
+    }
+    addHistory(history)
+
+    return { data: 'success' }
+  },
+  updateCustomer: config => {
+    console.log(config)
+    const data = JSON.parse(config.body)
+    for (const item of _customers) {
+      if (item.id === data.id) {
+        let change = ''
+        for (const key in item) {
+          if (item[key] !== data[key]) {
+            change += `${key}由[${item[key]}]改为[${data[key]}]; `
+            item[key] = data[key]
+          }
+        }
+        if (change !== '') {
+          const history = {}
+          history.type = 'Customer'
+          history.associateID = item.id
+          history.operateDate = new Date()
+          history.employeeID = 'admin'
+          history.employeeName = 'Admin'
+          history.operate = '修改记录。 ' + change
+          addHistory(history)
+        }
+
+        break
+      }
+    }
+    return { data: 'success' }
+  }
 }
 
 // 初始化客人列表
@@ -58,6 +107,10 @@ export function initCustomers(rows) {
       registeredCode: item.registeredCode,
       like: '@title',
       remark: item.remark,
+
+      roomNo: item.roomNo,
+      checkinDate: item.checkinDate,
+      checkoutDate: item.checkoutDate
     })
     _customers.push(customer)
 

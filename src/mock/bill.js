@@ -68,7 +68,7 @@ export default {
       if (change !== '') {
         const history = {}
         history.type = 'Bill'
-        history.orderNo = billz.orderNo
+        history.associateID = billz.orderNo
         history.operateDate = new Date()
         history.employeeID = 'admin'
         history.employeeName = 'Admin'

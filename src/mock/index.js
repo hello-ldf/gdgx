@@ -10,6 +10,7 @@ import meetingRoomAPI from './meetingRoom'
 import historyAPI from './history'
 import billAPI from './bill'
 import customerAPI from './customer'
+import floorPlanMock from './floor-plan'
 
 // 修复在使用 MockJS 情况下，设置 withCredentials = true，且未被拦截的跨域请求丢失 Cookies 的问题
 // https://github.com/nuysoft/Mock/issues/300
@@ -64,5 +65,11 @@ Mock.mock(/\/History\/FetchList/, 'get', historyAPI.fetchList)
 // 客人
 Mock.mock(/\/Customer\/FetchCustomers/, 'get', customerAPI.fetchList)
 Mock.mock(/\/Customer\/GetCustomerDetail/, 'get', customerAPI.getCustomerDetail)
+Mock.mock(/\/Customer\/CreateCustomer/, 'post', customerAPI.createCustomer)
+Mock.mock(/\/Customer\/UpdateCustomer/, 'post', customerAPI.updateCustomer)
+
+// 平面图
+Mock.mock(/\/FloorPlan\/FetchList/, 'get', floorPlanMock.fetchList)
+Mock.mock(/\/FloorPlan\/GetDetail/, 'get', floorPlanMock.getDetail)
 
 export default Mock

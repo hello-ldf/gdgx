@@ -11,13 +11,13 @@ const List = []
 // const Random = Mock.Random
 export default {
   fetchList: config => {
-    const { type, orderNo, page = 1, limit = 20 } = param2Obj(config.url)
+    const { type, associateID, page = 1, limit = 20 } = param2Obj(config.url)
 
     if (!type) console.log('类型type不能为空')
 
     const mockList = List.filter(item => {
       if (item.type !== type) return false
-      if (item.orderNo.toString() !== orderNo.toString()) return false
+      if (item.associateID.toString() !== associateID.toString()) return false
       return true
     }).sort(compare('operateDate'))
 
@@ -37,12 +37,10 @@ export function addHistory(history) {
 }
 
 export function initRoomReserveHistory(rows) {
-  // const rows = JSON.parse(config.body)
-//   console.log(i18n.t('roomReserve.obj.userNo'))
   for (const item of rows) {
     const data = {}
     data.type = 'RoomReserve'
-    data.orderNo = item.orderNo
+    data.associateID = item.orderNo
     data.operateDate = new Date()
     data.employeeID = 'admin'
     data.employeeName = 'Admin'

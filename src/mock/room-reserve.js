@@ -71,9 +71,23 @@ export default {
     const data = JSON.parse(config.body)
     data.id = Random.id()
     List.unshift(data)
+
+    const history = {}
+    history.type = 'RoomReserve'
+    history.associateID = data.orderNo
+    history.operateDate = new Date()
+    history.employeeID = 'admin'
+    history.employeeName = 'Admin'
+    history.operate = '新增记录。'
+    for (const key in data) {
+      history.operate += `${key}: ${data[key]}; `
+    }
+    addHistory(history)
+
     return { data: 'success' }
   },
   update: (config) => {
+    console.log(config)
     const data = JSON.parse(config.body)
     for (const item of List) {
       if (item.id === data.id) {
@@ -87,7 +101,7 @@ export default {
         if (change !== '') {
           const history = {}
           history.type = 'RoomReserve'
-          history.roomNo = item['roomNo']
+          history.associateID = item['orderNo']
           history.operateDate = new Date()
           history.employeeID = 'admin'
           history.employeeName = 'Admin'

@@ -1,6 +1,7 @@
 export default {
   route: {
     dashboard: '首页',
+    FloorPlan: '平面图管理',
     RoomReserve: '房间预订',
     MeetingRoom: '会议室预订',
     Bill: '账单管理',
